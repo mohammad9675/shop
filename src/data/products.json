@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "title": "Spring Oversized Coat",
+    "image": "../public/images/pImage.jpeg"
+  },
+  {
+    "id": 2,
+    "title": "Monochrome Drape Blazer",
+    "image": "../public/images/pImage.jpeg"
+  }
+]
