@@ -12,7 +12,7 @@ const navBarStyles = {
 };
 
 const linkStyles = {
-  fontSize: "0.95rem",
+  fontSize: "0.75rem",
   cursor: "pointer",
   transition: "color 0.2s",
   "&:hover": {
