@@ -1,5 +1,4 @@
 /* index.css or global.css */
-
 :root {
   --primary-color: #yourMainColor; /* optional, define global vars here */
 }
@@ -18,4 +17,14 @@ body {
   font-family: "YourFont", sans-serif;
   background-color: #ffffff; /* or whatever your background is */
   color: #fff; /* adjust for contrast */
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  color: black !important; /* ✅ Make arrows black */
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 20px; /* Optional: reduce size */
 }
