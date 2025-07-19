@@ -1,12 +1,15 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage.jsx";
-import AnnouncementBanner from "./pages/AnnouncementBanner.jsx";
+import ProductDetailsPage from "./pages/ProductDetails.jsx";
 
 function App() {
   return (
-    <>
-      <AnnouncementBanner />
-      <HomePage />
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/products/:id" element={<ProductDetailsPage />} />
+      </Routes>
+    </Router>
   );
 }
 

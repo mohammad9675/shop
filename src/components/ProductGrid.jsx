@@ -116,14 +116,24 @@ export default function ProductGrid() {
           slidesPerView={4}
           spaceBetween={20}
           centeredSlides={products.length < 4}
-          // breakpoints={{
-          //   960: { slidesPerView: 4 },
-          //   600: { slidesPerView: 1 },
-          // }}
+          breakpoints={{
+            1200: {
+              slidesPerView: 4,
+            },
+            960: {
+              slidesPerView: 3,
+            },
+            720: {
+              slidesPerView: 2,
+            },
+            0: {
+              slidesPerView: 1,
+            },
+          }}
         >
           {products.map((product) => (
             <SwiperSlide key={product.id}>
-              <Box key={product.id} sx={{ px: 2 }}>
+              <Box sx={{ px: 2 }}>
                 <Card sx={cardStyles}>
                   <CardMedia
                     component="img"
