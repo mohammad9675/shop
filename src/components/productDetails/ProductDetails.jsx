@@ -12,6 +12,7 @@ import {
   Rating,
   Grid,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
@@ -20,6 +21,75 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import axios from "axios";
+
+const closeButtonStyles = {
+  position: "absolute",
+  top: 16,
+  right: 16,
+  zIndex: 1400,
+  cursor: "pointer",
+  bgcolor: "rgba(255, 255, 255, 0.8)",
+  borderRadius: "50%",
+  padding: "4px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const firstWrapperStyles = { px: 4, py: 6, maxWidth: 1200, mx: "auto" };
+const secondWrapperStyles = { width: "100%", maxWidth: 500, mx: "auto" };
+
+const imageContainerStyles = {
+  width: "100%",
+  height: "auto",
+  objectFit: "contain",
+  cursor: "pointer",
+  borderRadius: 2,
+};
+
+const tileStyles = { fontWeight: "bold", mb: 2, color: "#000000" };
+
+const selectorStyles = {
+  display: "flex",
+  gap: 2,
+  mb: 3,
+  mt: 3,
+  flexWrap: "wrap",
+};
+
+const addToCardButtonStyles = {
+  backgroundColor: "black",
+  color: "white",
+  mb: 4,
+  px: 4,
+  py: 1.5,
+  "&:hover": { backgroundColor: "#111" },
+};
+
+const imageModalStyles = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100vw",
+  height: "100vh",
+  bgcolor: "transparent",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1300,
+};
+
+const modalImagesStyles = {
+  maxWidth: "95vw",
+  maxHeight: "95vh",
+  width: "auto",
+  height: "auto",
+  objectFit: "contain",
+  borderRadius: 2,
+  boxShadow: "0 0 16px rgba(0,0,0,0.25)",
+  mx: "auto",
+  display: "block",
+};
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -67,17 +137,18 @@ export default function ProductDetails() {
   }
   console.log("object", product);
   return (
-    <Box sx={{ px: 4, py: 6, maxWidth: 1200, mx: "auto" }}>
+    <Box sx={firstWrapperStyles}>
       <Grid container spacing={4}>
         {/* Left side - Swiper */}
         <Grid item xs={12} md={5}>
-          <Box sx={{ width: "100%", maxWidth: 500, mx: "auto" }}>
+          <Box sx={secondWrapperStyles}>
             <Swiper
               modules={[Navigation]}
               navigation
               spaceBetween={10}
               slidesPerView={1}
               style={{ borderRadius: "8px" }}
+              loop={true}
             >
               {product.images?.map((img, index) => (
                 <SwiperSlide key={index}>
@@ -85,13 +156,7 @@ export default function ProductDetails() {
                     component="img"
                     src={img}
                     alt={`product-${index}`}
-                    sx={{
-                      width: "100%",
-                      height: "auto",
-                      objectFit: "contain",
-                      cursor: "pointer",
-                      borderRadius: 2,
-                    }}
+                    sx={imageContainerStyles}
                     onClick={() => handleImageClick(img)}
                   />
                 </SwiperSlide>
@@ -102,10 +167,7 @@ export default function ProductDetails() {
 
         {/* Right side - Details */}
         <Grid item xs={12} md={7}>
-          <Typography
-            variant="h5"
-            sx={{ fontWeight: "bold", mb: 2, color: "#000000" }}
-          >
+          <Typography variant="h5" sx={tileStyles}>
             {product.title}
           </Typography>
 
@@ -116,7 +178,7 @@ export default function ProductDetails() {
           </Typography>
 
           {/* Selectors */}
-          <Box sx={{ display: "flex", gap: 2, mb: 3, mt: 3, flexWrap: "wrap" }}>
+          <Box sx={selectorStyles}>
             <TextField
               label="Quantity"
               type="number"
@@ -126,7 +188,6 @@ export default function ProductDetails() {
                 setQuantity(Math.max(1, parseInt(e.target.value)))
               }
               sx={{ width: 100 }}
-              inputProps={{ min: 1 }}
             />
 
             <FormControl size="small">
@@ -160,17 +221,7 @@ export default function ProductDetails() {
             </FormControl>
           </Box>
 
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "black",
-              color: "white",
-              mb: 4,
-              px: 4,
-              py: 1.5,
-              "&:hover": { backgroundColor: "#111" },
-            }}
-          >
+          <Button variant="contained" sx={addToCardButtonStyles}>
             Add to Cart
           </Button>
 
@@ -199,44 +250,10 @@ export default function ProductDetails() {
       </Grid>
 
       <Modal open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <Box
-          sx={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            bgcolor: "transparent",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1300,
-          }}
-        >
+        <Box sx={imageModalStyles}>
           {/* Close Button */}
-          <Box
-            sx={{
-              position: "absolute",
-              top: 16,
-              right: 16,
-              zIndex: 1400,
-              cursor: "pointer",
-              bgcolor: "rgba(255, 255, 255, 0.8)",
-              borderRadius: "50%",
-              padding: "4px",
-            }}
-            onClick={() => setDialogOpen(false)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="24"
-              viewBox="0 0 24 24"
-              width="24"
-              fill="black"
-            >
-              <path d="M0 0h24v24H0z" fill="none" />
-              <path d="M18.3 5.71a1 1 0 00-1.41 0L12 10.59 7.11 5.7a1 1 0 00-1.41 1.41L10.59 12l-4.89 4.89a1 1 0 101.41 1.41L12 13.41l4.89 4.89a1 1 0 001.41-1.41L13.41 12l4.89-4.89a1 1 0 000-1.4z" />
-            </svg>
+          <Box sx={closeButtonStyles} onClick={() => setDialogOpen(false)}>
+            <CloseIcon fontSize="small" sx={{ color: "black" }} />
           </Box>
 
           {/* Swiper with Fullscreen Images */}
@@ -248,6 +265,7 @@ export default function ProductDetails() {
               maxWidth: "95vw",
               maxHeight: "95vh",
             }}
+            loop={true}
           >
             {product.images.map((img, idx) => (
               <SwiperSlide key={idx}>
@@ -255,17 +273,7 @@ export default function ProductDetails() {
                   component="img"
                   src={img}
                   alt={`Image ${idx}`}
-                  sx={{
-                    maxWidth: "95vw",
-                    maxHeight: "95vh",
-                    width: "auto",
-                    height: "auto",
-                    objectFit: "contain",
-                    borderRadius: 2,
-                    boxShadow: "0 0 16px rgba(0,0,0,0.25)",
-                    mx: "auto",
-                    display: "block",
-                  }}
+                  sx={modalImagesStyles}
                 />
               </SwiperSlide>
             ))}
