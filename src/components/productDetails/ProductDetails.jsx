@@ -181,8 +181,6 @@ export default function ProductDetails() {
           <Box
             sx={{
               height: "fit-content",
-              maxHeight: "600px",
-              overflow: "hidden",
             }}
           >
             <Typography variant="h5" sx={tileStyles}>
@@ -257,7 +255,7 @@ export default function ProductDetails() {
             </Box>
 
             {/* Product Information Accordion */}
-            <Box sx={{ mt: 2, maxHeight: 300, overflow: "auto" }}>
+            <Box sx={{ mt: 2 }}>
               <Accordion
                 elevation={0}
                 sx={{ boxShadow: "none", border: "none" }}
