@@ -11,6 +11,7 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 
 // 🎨 Styles
@@ -78,22 +79,38 @@ const viewAllButtonStyles = {
 };
 
 export default function ProductGrid({ title }) {
+  const { id: productId } = useParams();
+  const isSimilarItems = title === "Similar Items";
+
   const {
     data: products,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["products"],
+    queryKey: isSimilarItems ? ["similarProducts", productId] : ["products"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3001/api/products");
-      return res.data;
+      if (isSimilarItems) {
+        // Call similar products API
+        if (!productId) {
+          throw new Error("Product ID is required for similar items");
+        }
+        const res = await axios.get(
+          `http://localhost:3001/api/products/${productId}/similar`
+        );
+        return res.data.similarProducts;
+      } else {
+        // Call all products API
+        const res = await axios.get("http://localhost:3001/api/products");
+        return res.data.products;
+      }
     },
+    enabled: !isSimilarItems || !!productId, // Only run query if not similar items OR if productId exists
   });
 
   if (error) {
     return (
-      <Box sx={{ textAlign: "center", py: 6 }}>
-        <Typography variant="h6" color="error">
+      <Box sx={sectionStyles}>
+        <Typography color="error" align="center">
           Failed to load products
         </Typography>
       </Box>
@@ -105,7 +122,7 @@ export default function ProductGrid({ title }) {
       {/* Divider */}
       <Box sx={dividerStyles}>
         <Box sx={lineStyles} />
-        <Typography variant="h6" sx={titleStyles}>
+        <Typography variant="h5" sx={titleStyles}>
           {title}
         </Typography>
         <Box sx={lineStyles} />
@@ -113,51 +130,42 @@ export default function ProductGrid({ title }) {
 
       {/* Slider */}
       {isLoading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight={300}
+        >
           <CircularProgress />
         </Box>
       ) : (
         <Swiper
           modules={[Navigation]}
-          navigation={true}
-          slidesPerView={4}
-          spaceBetween={20}
-          centeredSlides={products?.length < 4}
+          spaceBetween={16}
+          slidesPerView={1}
+          navigation
           breakpoints={{
-            1200: {
-              slidesPerView: 4,
-            },
-            960: {
-              slidesPerView: 3,
-            },
-            720: {
-              slidesPerView: 2,
-            },
-            0: {
-              slidesPerView: 1,
-            },
+            640: { slidesPerView: 2 },
+            768: { slidesPerView: 3 },
+            1024: { slidesPerView: 4 },
           }}
         >
           {products?.map((product) => (
-            <SwiperSlide key={product.id}>
-              <Box sx={{ px: 2 }}>
-                <Card sx={cardStyles}>
-                  <CardMedia
-                    component="img"
-                    image={product.images?.[0]}
-                    alt={product.title}
-                    height="300"
-                  />
-                  <Box sx={priceChipStyles}>
-                    <Typography variant="body1">${product.price}</Typography>
-                  </Box>
-                  <Box sx={typoStyles}>
-                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                      {product.title}
-                    </Typography>
-                  </Box>
-                </Card>
-              </Box>
+            <SwiperSlide key={product._id}>
+              <Card sx={cardStyles}>
+                <CardMedia
+                  component="img"
+                  height="240"
+                  image={product.images?.[0]}
+                  alt={product.title}
+                />
+                <Typography variant="body2" sx={priceChipStyles}>
+                  ${product.price}
+                </Typography>
+                <Typography variant="h6" sx={typoStyles}>
+                  {product.title}
+                </Typography>
+              </Card>
             </SwiperSlide>
           ))}
         </Swiper>
@@ -165,7 +173,7 @@ export default function ProductGrid({ title }) {
 
       {/* View All Button */}
       {title !== "Similar Items" && (
-        <Box textAlign="center">
+        <Box display="flex" justifyContent="center">
           <Button variant="contained" sx={viewAllButtonStyles}>
             View All
           </Button>
