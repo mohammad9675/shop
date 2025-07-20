@@ -2,7 +2,7 @@ import {
   Box,
   Typography,
   CircularProgress,
-  TextField,
+  Rating,
   Button,
   Modal,
   Grid,
@@ -24,6 +24,7 @@ import axios from "axios";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ProductInfoAccordion from "./ProductInfoAccordion.jsx";
 import ProductGrid from "../ProductGrid.jsx";
+import OverallRating from "../reviews/OverallRating.jsx";
 
 const closeButtonStyles = {
   position: "absolute",
@@ -246,7 +247,6 @@ export default function ProductDetails() {
                 </Box>
               ))}
             </Box>
-
             {/* Quantity and Add to Cart button */}
             <Box sx={quantityAndButtonStyles}>
               <FormControl size="small" sx={{ width: 70 }}>
@@ -278,7 +278,7 @@ export default function ProductDetails() {
                 {product.inStock === false ? "Out of Stock" : "Add to Bag"}
               </Button>
             </Box>
-
+            <OverallRating reviews={product.reviews} />
             {/* Product Information Accordion */}
             <ProductInfoAccordion />
           </Box>
@@ -323,7 +323,7 @@ export default function ProductDetails() {
         </Typography>
       </Box>
 
-      <ProductGrid title="Similar Items" />
+      <ProductGrid title="Similar Items" parent="productDetails" />
       {/* <Reviews reviews={product.reviews} /> */}
     </Box>
   );
