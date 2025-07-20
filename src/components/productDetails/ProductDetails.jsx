@@ -172,12 +172,6 @@ export default function ProductDetails() {
             {product.title}
           </Typography>
 
-          {/* Specs */}
-
-          <Typography variant="p" sx={{ color: "#000000" }}>
-            {product.description}
-          </Typography>
-
           {/* Selectors */}
           <Box sx={selectorStyles}>
             <TextField
@@ -225,9 +219,6 @@ export default function ProductDetails() {
           <Button variant="contained" sx={addToCardButtonStyles}>
             Add to Cart
           </Button>
-
-          {/* Reviews */}
-          <Reviews reviews={product.reviews} />
         </Grid>
       </Grid>
 
@@ -262,6 +253,12 @@ export default function ProductDetails() {
           </Swiper>
         </Box>
       </Modal>
+
+      {/* <Typography variant="p" sx={{ color: "#000000" }}>
+        {product.description}
+      </Typography> */}
+      {/* Reviews */}
+      {/* <Reviews reviews={product.reviews} /> */}
     </Box>
   );
 }
