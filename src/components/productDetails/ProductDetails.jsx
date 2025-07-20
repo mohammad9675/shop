@@ -11,9 +11,13 @@ import {
   Modal,
   Rating,
   Grid,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import Reviews from "../reviews/Reviews.jsx";
 import CloseIcon from "@mui/icons-material/Close";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
@@ -23,6 +27,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import axios from "axios";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+
 const closeButtonStyles = {
   position: "absolute",
   top: 16,
@@ -173,75 +178,198 @@ export default function ProductDetails() {
 
         {/* Right side - Details */}
         <Grid xs={12} md={7}>
-          <Typography variant="h5" sx={tileStyles}>
-            {product.title}
-          </Typography>
+          <Box
+            sx={{
+              height: "fit-content",
+              maxHeight: "600px",
+              overflow: "hidden",
+            }}
+          >
+            <Typography variant="h5" sx={tileStyles}>
+              {product.title}
+            </Typography>
 
-          {/* Color selector */}
-          <Box sx={selectorStyles}>
-            {product.colors?.map((color) => (
-              <Box
-                key={color}
-                onClick={() => setSelectedColor(color)}
-                sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: "50%",
-                  backgroundColor: color,
-                  border:
-                    color === selectedColor
-                      ? "2px solid black"
-                      : "1px solid #ccc",
-                  cursor: "pointer",
-                }}
+            {/* Color selector */}
+            <Box sx={selectorStyles}>
+              {product.colors?.map((color) => (
+                <Box
+                  key={color}
+                  onClick={() => setSelectedColor(color)}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50%",
+                    backgroundColor: color,
+                    border:
+                      color === selectedColor
+                        ? "2px solid black"
+                        : "1px solid #ccc",
+                    cursor: "pointer",
+                  }}
+                />
+              ))}
+            </Box>
+
+            {/* Size selector */}
+            <Box sx={selectorStyles}>
+              {product.sizes?.map((size) => (
+                <Box
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border:
+                      size === selectedSize
+                        ? "2px solid black"
+                        : "1px solid #ccc",
+                    cursor: "pointer",
+                    backgroundColor: "#f5f5f5",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {size}
+                </Box>
+              ))}
+            </Box>
+
+            {/* Quantity and Add to Cart button */}
+            <Box sx={quantityAndButtonStyles}>
+              <TextField
+                label="Qty"
+                type="number"
+                size="small"
+                value={quantity}
+                onChange={(e) =>
+                  setQuantity(Math.max(1, parseInt(e.target.value)))
+                }
+                sx={{ width: 80 }}
+                inputProps={{ min: 1 }}
               />
-            ))}
-          </Box>
 
-          {/* Size selector */}
-          <Box sx={selectorStyles}>
-            {product.sizes?.map((size) => (
-              <Box
-                key={size}
-                onClick={() => setSelectedSize(size)}
-                sx={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border:
-                    size === selectedSize
-                      ? "2px solid black"
-                      : "1px solid #ccc",
-                  cursor: "pointer",
-                  backgroundColor: "#f5f5f5",
-                  fontWeight: "bold",
-                }}
+              <Button variant="contained" sx={addToCardButtonStyles}>
+                <ShoppingCartIcon />
+              </Button>
+            </Box>
+
+            {/* Product Information Accordion */}
+            <Box sx={{ mt: 2, maxHeight: 300, overflow: "auto" }}>
+              <Accordion
+                elevation={0}
+                sx={{ boxShadow: "none", border: "none" }}
               >
-                {size}
-              </Box>
-            ))}
-          </Box>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  sx={{
+                    borderTop: "1px solid #e0e0e0",
+                    borderBottom: "1px solid #e0e0e0",
+                    px: 0,
+                    minHeight: 48,
+                    "& .MuiAccordionSummary-content": {
+                      margin: "8px 0",
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: "bold", color: "#333" }}
+                  >
+                    Size & Fit
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ px: 0, py: 1.5 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "#666",
+                      lineHeight: 1.5,
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    This garment fits true to size. Model is wearing size M and
+                    is 5'9" tall. Available in sizes XS to XXL.
+                  </Typography>
+                </AccordionDetails>
+              </Accordion>
 
-          {/* Quantity and Add to Cart button */}
-          <Box sx={quantityAndButtonStyles}>
-            <TextField
-              label="Qty"
-              type="number"
-              size="small"
-              value={quantity}
-              onChange={(e) =>
-                setQuantity(Math.max(1, parseInt(e.target.value)))
-              }
-              sx={{ width: 80 }}
-              inputProps={{ min: 1 }}
-            />
+              <Accordion
+                elevation={0}
+                sx={{ boxShadow: "none", border: "none" }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  sx={{
+                    borderBottom: "1px solid #e0e0e0",
+                    px: 0,
+                    minHeight: 48,
+                    "& .MuiAccordionSummary-content": {
+                      margin: "8px 0",
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: "bold", color: "#333" }}
+                  >
+                    Details & Material
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ px: 0, py: 1.5 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "#666",
+                      lineHeight: 1.5,
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    Premium organic cotton blend. 80% organic cotton, 20%
+                    recycled polyester. Machine washable.
+                  </Typography>
+                </AccordionDetails>
+              </Accordion>
 
-            <Button variant="contained" sx={addToCardButtonStyles}>
-              <ShoppingCartIcon />
-            </Button>
+              <Accordion
+                elevation={0}
+                sx={{ boxShadow: "none", border: "none" }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  sx={{
+                    borderBottom: "1px solid #e0e0e0",
+                    px: 0,
+                    minHeight: 48,
+                    "& .MuiAccordionSummary-content": {
+                      margin: "8px 0",
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: "bold", color: "#333" }}
+                  >
+                    Shipping & Returns
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ px: 0, py: 1.5 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "#666",
+                      lineHeight: 1.5,
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    Free shipping on orders over $75. 3-5 business days
+                    delivery. Easy 30-day returns.
+                  </Typography>
+                </AccordionDetails>
+              </Accordion>
+            </Box>
           </Box>
         </Grid>
       </Grid>
