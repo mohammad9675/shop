@@ -22,7 +22,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import axios from "axios";
-
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 const closeButtonStyles = {
   position: "absolute",
   top: 16,
@@ -53,15 +53,20 @@ const tileStyles = { fontWeight: "bold", mb: 2, color: "#000000" };
 const selectorStyles = {
   display: "flex",
   gap: 2,
-  mb: 3,
-  mt: 3,
+  mb: 2,
   flexWrap: "wrap",
+};
+
+const quantityAndButtonStyles = {
+  display: "flex",
+  gap: 2,
+  mb: 2,
+  alignItems: "center",
 };
 
 const addToCardButtonStyles = {
   backgroundColor: "black",
   color: "white",
-  mb: 4,
   px: 4,
   py: 1.5,
   "&:hover": { backgroundColor: "#111" },
@@ -172,53 +177,72 @@ export default function ProductDetails() {
             {product.title}
           </Typography>
 
-          {/* Selectors */}
+          {/* Color selector */}
           <Box sx={selectorStyles}>
+            {product.colors?.map((color) => (
+              <Box
+                key={color}
+                onClick={() => setSelectedColor(color)}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  backgroundColor: color,
+                  border:
+                    color === selectedColor
+                      ? "2px solid black"
+                      : "1px solid #ccc",
+                  cursor: "pointer",
+                }}
+              />
+            ))}
+          </Box>
+
+          {/* Size selector */}
+          <Box sx={selectorStyles}>
+            {product.sizes?.map((size) => (
+              <Box
+                key={size}
+                onClick={() => setSelectedSize(size)}
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border:
+                    size === selectedSize
+                      ? "2px solid black"
+                      : "1px solid #ccc",
+                  cursor: "pointer",
+                  backgroundColor: "#f5f5f5",
+                  fontWeight: "bold",
+                }}
+              >
+                {size}
+              </Box>
+            ))}
+          </Box>
+
+          {/* Quantity and Add to Cart button */}
+          <Box sx={quantityAndButtonStyles}>
             <TextField
-              label="Quantity"
+              label="Qty"
               type="number"
               size="small"
               value={quantity}
               onChange={(e) =>
                 setQuantity(Math.max(1, parseInt(e.target.value)))
               }
-              sx={{ width: 100 }}
+              sx={{ width: 80 }}
+              inputProps={{ min: 1 }}
             />
 
-            <FormControl size="small">
-              <InputLabel>Color</InputLabel>
-              <Select
-                value={selectedColor}
-                label="Color"
-                onChange={(e) => setSelectedColor(e.target.value)}
-              >
-                {product.colors?.map((color) => (
-                  <MenuItem key={color} value={color}>
-                    {color}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl size="small">
-              <InputLabel>Size</InputLabel>
-              <Select
-                value={selectedSize}
-                label="Size"
-                onChange={(e) => setSelectedSize(e.target.value)}
-              >
-                {product.sizes?.map((size) => (
-                  <MenuItem key={size} value={size}>
-                    {size}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <Button variant="contained" sx={addToCardButtonStyles}>
+              <ShoppingCartIcon />
+            </Button>
           </Box>
-
-          <Button variant="contained" sx={addToCardButtonStyles}>
-            Add to Cart
-          </Button>
         </Grid>
       </Grid>
 
