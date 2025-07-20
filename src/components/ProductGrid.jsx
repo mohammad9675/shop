@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Box,
   Card,
@@ -11,6 +10,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 // 🎨 Styles
@@ -33,7 +33,7 @@ const lineStyles = {
 };
 
 const titleStyles = {
-  color: "red",
+  color: "#333",
   fontWeight: "bold",
   mx: 2,
 };
@@ -66,7 +66,7 @@ const priceChipStyles = {
 };
 
 const viewAllButtonStyles = {
-  backgroundColor: "#000",
+  backgroundColor: "#0275c9",
   color: "#fff",
   px: 4,
   py: 1,
@@ -74,24 +74,31 @@ const viewAllButtonStyles = {
   "&:hover": {
     backgroundColor: "#111",
   },
+  borderRadius: 6,
 };
 
-export default function ProductGrid() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function ProductGrid({ title }) {
+  const {
+    data: products,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const res = await axios.get("http://localhost:3001/api/products");
+      return res.data;
+    },
+  });
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:3001/api/products")
-      .then((res) => {
-        setProducts(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
+  if (error) {
+    return (
+      <Box sx={{ textAlign: "center", py: 6 }}>
+        <Typography variant="h6" color="error">
+          Failed to load products
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={sectionStyles}>
@@ -99,13 +106,13 @@ export default function ProductGrid() {
       <Box sx={dividerStyles}>
         <Box sx={lineStyles} />
         <Typography variant="h6" sx={titleStyles}>
-          Discounted Products
+          {title}
         </Typography>
         <Box sx={lineStyles} />
       </Box>
 
       {/* Slider */}
-      {loading ? (
+      {isLoading ? (
         <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
           <CircularProgress />
         </Box>
@@ -115,7 +122,7 @@ export default function ProductGrid() {
           navigation={true}
           slidesPerView={4}
           spaceBetween={20}
-          centeredSlides={products.length < 4}
+          centeredSlides={products?.length < 4}
           breakpoints={{
             1200: {
               slidesPerView: 4,
@@ -131,13 +138,13 @@ export default function ProductGrid() {
             },
           }}
         >
-          {products.map((product) => (
+          {products?.map((product) => (
             <SwiperSlide key={product.id}>
               <Box sx={{ px: 2 }}>
                 <Card sx={cardStyles}>
                   <CardMedia
                     component="img"
-                    image={product.image}
+                    image={product.images?.[0]}
                     alt={product.title}
                     height="300"
                   />
@@ -157,11 +164,13 @@ export default function ProductGrid() {
       )}
 
       {/* View All Button */}
-      <Box textAlign="center">
-        <Button variant="contained" sx={viewAllButtonStyles}>
-          View All
-        </Button>
-      </Box>
+      {title !== "Similar Items" && (
+        <Box textAlign="center">
+          <Button variant="contained" sx={viewAllButtonStyles}>
+            View All
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 }

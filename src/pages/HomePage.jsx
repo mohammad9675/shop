@@ -9,7 +9,7 @@ export default function HomePage() {
       <TopBar />
       <MainNav />
       <Hero />
-      <ProductGrid />
+      <ProductGrid title="Discounted Items" />
     </>
   );
 }

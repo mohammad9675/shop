@@ -6,6 +6,10 @@ import {
   Button,
   Modal,
   Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import Reviews from "../reviews/Reviews.jsx";
 import CloseIcon from "@mui/icons-material/Close";
@@ -19,6 +23,7 @@ import { useState } from "react";
 import axios from "axios";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ProductInfoAccordion from "./ProductInfoAccordion.jsx";
+import ProductGrid from "../ProductGrid.jsx";
 
 const closeButtonStyles = {
   position: "absolute",
@@ -68,11 +73,12 @@ const quantityAndButtonStyles = {
 };
 
 const addToCardButtonStyles = {
-  backgroundColor: "black",
+  backgroundColor: "#0275c9",
   color: "white",
-  px: 4,
-  py: 1.5,
+  px: 8,
+  py: 1,
   "&:hover": { backgroundColor: "#111" },
+  borderRadius: 6,
 };
 
 const imageModalStyles = {
@@ -243,20 +249,33 @@ export default function ProductDetails() {
 
             {/* Quantity and Add to Cart button */}
             <Box sx={quantityAndButtonStyles}>
-              <TextField
-                label="Qty"
-                type="number"
-                size="small"
-                value={quantity}
-                onChange={(e) =>
-                  setQuantity(Math.max(1, parseInt(e.target.value)))
-                }
-                sx={{ width: 80 }}
-                inputProps={{ min: 1 }}
-              />
-
-              <Button variant="contained" sx={addToCardButtonStyles}>
-                <ShoppingCartIcon />
+              <FormControl size="small" sx={{ width: 70 }}>
+                <InputLabel>Qty</InputLabel>
+                <Select
+                  value={quantity}
+                  label="Qty"
+                  onChange={(e) => setQuantity(e.target.value)}
+                >
+                  {[...Array(5)].map((_, index) => (
+                    <MenuItem key={index + 1} value={index + 1}>
+                      {index + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <Button
+                variant="contained"
+                sx={{
+                  ...addToCardButtonStyles,
+                  ...(product.inStock === false && {
+                    backgroundColor: "#ccc",
+                    color: "#666",
+                    "&:hover": { backgroundColor: "#ccc" },
+                  }),
+                }}
+                disabled={product.inStock === false}
+              >
+                {product.inStock === false ? "Out of Stock" : "Add to Bag"}
               </Button>
             </Box>
 
@@ -298,10 +317,13 @@ export default function ProductDetails() {
         </Box>
       </Modal>
 
-      {/* <Typography variant="p" sx={{ color: "#000000" }}>
-        {product.description}
-      </Typography> */}
-      {/* Reviews */}
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="p" sx={{ color: "#000000" }}>
+          {product.description}
+        </Typography>
+      </Box>
+
+      <ProductGrid title="Similar Items" />
       {/* <Reviews reviews={product.reviews} /> */}
     </Box>
   );
