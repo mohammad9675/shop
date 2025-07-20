@@ -12,6 +12,7 @@ import {
   Rating,
   Grid,
 } from "@mui/material";
+import Reviews from "../reviews/Reviews.jsx";
 import CloseIcon from "@mui/icons-material/Close";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -135,12 +136,12 @@ export default function ProductDetails() {
       </Box>
     );
   }
-  console.log("object", product);
+
   return (
     <Box sx={firstWrapperStyles}>
       <Grid container spacing={4}>
         {/* Left side - Swiper */}
-        <Grid item xs={12} md={5}>
+        <Grid xs={12} md={5}>
           <Box sx={secondWrapperStyles}>
             <Swiper
               modules={[Navigation]}
@@ -148,7 +149,7 @@ export default function ProductDetails() {
               spaceBetween={10}
               slidesPerView={1}
               style={{ borderRadius: "8px" }}
-              loop={true}
+              loop={product.images?.length > 1}
             >
               {product.images?.map((img, index) => (
                 <SwiperSlide key={index}>
@@ -166,7 +167,7 @@ export default function ProductDetails() {
         </Grid>
 
         {/* Right side - Details */}
-        <Grid item xs={12} md={7}>
+        <Grid xs={12} md={7}>
           <Typography variant="h5" sx={tileStyles}>
             {product.title}
           </Typography>
@@ -225,27 +226,8 @@ export default function ProductDetails() {
             Add to Cart
           </Button>
 
-          <Typography variant="body1" sx={{ mb: 4 }}>
-            {product.description}
-          </Typography>
-
           {/* Reviews */}
-          <Box>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Customer Reviews
-            </Typography>
-            {product.reviews?.length ? (
-              product.reviews.map((review, i) => (
-                <Box key={i} sx={{ mb: 2 }}>
-                  <Typography variant="subtitle2">{review.name}</Typography>
-                  <Rating value={review.rating} readOnly size="small" />
-                  <Typography variant="body2">{review.comment}</Typography>
-                </Box>
-              ))
-            ) : (
-              <Typography variant="body2">No reviews yet.</Typography>
-            )}
-          </Box>
+          <Reviews reviews={product.reviews} />
         </Grid>
       </Grid>
 
@@ -265,7 +247,7 @@ export default function ProductDetails() {
               maxWidth: "95vw",
               maxHeight: "95vh",
             }}
-            loop={true}
+            loop={product.images?.length > 1}
           >
             {product.images.map((img, idx) => (
               <SwiperSlide key={idx}>
