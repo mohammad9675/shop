@@ -21,10 +21,10 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import axios from "axios";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ProductInfoAccordion from "./ProductInfoAccordion.jsx";
 import ProductGrid from "../ProductGrid.jsx";
 import OverallRating from "../reviews/OverallRating.jsx";
+import { useCart } from "../../context/CartContext.jsx";
 
 const closeButtonStyles = {
   position: "absolute",
@@ -115,6 +115,8 @@ export default function ProductDetails() {
   const [dialogImage, setDialogImage] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  const { addToCart } = useCart();
+
   const {
     data: product,
     isLoading,
@@ -134,6 +136,22 @@ export default function ProductDetails() {
   const handleImageClick = (img) => {
     setDialogImage(img);
     setDialogOpen(true);
+  };
+
+  const handleAddToBag = () => {
+    if (!selectedColor || !selectedSize) {
+      alert("Please select a color and size before adding to the bag.");
+      return;
+    }
+    addToCart({
+      id: product._id,
+      title: product.title,
+      price: product.price,
+      quantity,
+      color: selectedColor,
+      size: selectedSize,
+      image: product.images?.[0] || "",
+    });
   };
 
   if (isLoading) {
@@ -274,6 +292,7 @@ export default function ProductDetails() {
                   }),
                 }}
                 disabled={product.inStock === false}
+                onClick={handleAddToBag}
               >
                 {product.inStock === false ? "Out of Stock" : "Add to Bag"}
               </Button>

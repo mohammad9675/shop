@@ -8,6 +8,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import PersonIcon from "@mui/icons-material/Person";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import { useCart } from "../context/CartContext";
 
 const topBarStyles = {
   display: "flex",
@@ -37,6 +38,8 @@ const iconsStyles = {
 };
 
 export default function TopBar() {
+  const { getTotalQuantity } = useCart();
+
   return (
     <Box sx={topBarStyles}>
       <Box sx={searchBoxStyles}>
@@ -68,7 +71,7 @@ export default function TopBar() {
 
       <Box sx={iconsStyles}>
         <IconButton>
-          <Badge badgeContent={1} color="primary">
+          <Badge badgeContent={getTotalQuantity()} color="primary">
             <ShoppingBagIcon />
           </Badge>
         </IconButton>
