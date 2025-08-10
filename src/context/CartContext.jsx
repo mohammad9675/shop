@@ -1,50 +1,66 @@
 // src/context/CartContext.jsx
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState(() => {
-    // Load from localStorage on init
-    const savedCart = localStorage.getItem("cart");
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
+  const [cartItems, setCartItems] = useState([]);
 
-  // Sync to localStorage whenever cart changes
+  // Load cart from localStorage on first render
+  useEffect(() => {
+    const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
+      setCartItems(JSON.parse(storedCart));
+    }
+  }, []);
+
+  // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (item) => {
+  function addToCart(item) {
     setCartItems((prev) => {
-      const existingIndex = prev.findIndex(
+      const existing = prev.find(
         (p) =>
-          p.id === item.id && p.color === item.color && p.size === item.size
+          p.id === item.id && p.size === item.size && p.color === item.color
       );
-
-      if (existingIndex !== -1) {
-        // If same product/color/size → increase quantity
-        const updated = [...prev];
-        updated[existingIndex].quantity += item.quantity;
-        return updated;
+      if (existing) {
+        return prev.map((p) =>
+          p.id === item.id && p.size === item.size && p.color === item.color
+            ? { ...p, quantity: p.quantity + item.quantity }
+            : p
+        );
       }
       return [...prev, item];
     });
-  };
+  }
 
-  const removeFromCart = (id, color, size) => {
+  function removeFromCart(itemId, size, color) {
     setCartItems((prev) =>
-      prev.filter((p) => !(p.id === id && p.color === color && p.size === size))
+      prev.filter(
+        (p) => !(p.id === itemId && p.size === size && p.color === color)
+      )
     );
-  };
+  }
 
-  const getTotalQuantity = () => {
-    return cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  };
+  function getTotalQuantity() {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  }
+
+  function getSubtotal() {
+    return cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  }
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, getTotalQuantity }}
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        getTotalQuantity,
+        getSubtotal,
+      }}
     >
       {children}
     </CartContext.Provider>
