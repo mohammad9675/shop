@@ -8,14 +8,22 @@ import {
   Divider,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useCart } from "../../context/CartContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function CartDrawer({ open, onClose }) {
   const { cartItems, removeFromCart, getSubtotal } = useCart();
+  const navigate = useNavigate();
   const freeShippingThreshold = 59;
   const subtotal = getSubtotal();
   const remaining = Math.max(freeShippingThreshold - subtotal, 0);
   const progress = Math.min((subtotal / freeShippingThreshold) * 100, 100);
+
+  const handleReviewBag = () => {
+    onClose(); // close drawer
+    navigate("/review-bag"); // go to page
+  };
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
@@ -51,6 +59,8 @@ export default function CartDrawer({ open, onClose }) {
                 key={`${item.id}-${item.size}-${item.color}`}
                 display="flex"
                 mb={2}
+                alignItems="center"
+                sx={{ position: "relative" }}
               >
                 <Box
                   component="img"
@@ -67,16 +77,17 @@ export default function CartDrawer({ open, onClose }) {
                     ${item.price.toFixed(2)}
                   </Typography>
                   <Typography variant="body2">Qty: {item.quantity}</Typography>
-                  <Button
-                    size="small"
-                    color="error"
-                    onClick={() =>
-                      removeFromCart(item.id, item.size, item.color)
-                    }
-                  >
-                    Remove
-                  </Button>
                 </Box>
+                {/* Remove IconButton on right */}
+                <IconButton
+                  aria-label="remove item"
+                  size="small"
+                  color="error"
+                  onClick={() => removeFromCart(item.id, item.size, item.color)}
+                  sx={{ ml: 1 }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
               </Box>
             ))
           )}
@@ -116,6 +127,7 @@ export default function CartDrawer({ open, onClose }) {
           variant="contained"
           sx={{ mt: 2, borderRadius: 10, py: 1.5, fontWeight: "bold" }}
           fullWidth
+          onClick={handleReviewBag}
         >
           Review My Bag
         </Button>
