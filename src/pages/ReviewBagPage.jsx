@@ -22,7 +22,7 @@ import MainNav from "../components/MainNav.jsx";
 export default function ReviewBagPage() {
   const { cartItems, removeFromCart, getSubtotal } = useCart();
 
-  // Fetch each product in cart with secure pricing
+  // Fetch each product in cart
   const productQueries = useQueries({
     queries: cartItems.map((item) => ({
       queryKey: ["product", item.id],
@@ -30,56 +30,19 @@ export default function ReviewBagPage() {
         const res = await axios.get(
           `http://localhost:3001/api/products/${item.id}`
         );
-        // Merge database product data with cart item details (size, color, quantity)
-        return { 
-          ...res.data, 
-          cartItem: {
-            id: item.id,
-            size: item.size,
-            color: item.color,
-            quantity: item.quantity,
-            // Keep any other cart-specific data but NOT the price
-            image: item.image // This can stay as it's not security sensitive
-          }
-        };
+        return { ...res.data, cartItem: item };
       },
     })),
   });
 
   const isLoading = productQueries.some((q) => q.isLoading);
-  const hasError = productQueries.some((q) => q.isError);
-  
-  const products = productQueries
-    .map((q) => q.data)
-    .filter((p) => p && p.cartItem); // safe filter
+  const products = productQueries.map((q) => q.data).filter(Boolean);
 
-  // Calculate subtotal using database prices (secure)
-  const calculateSecureSubtotal = () => {
-    return products.reduce((total, product) => {
-      const { cartItem } = product;
-      // Use database price (product.price) NOT localStorage price
-      return total + (product.price * cartItem.quantity);
-    }, 0);
-  };
-
-  const secureSubtotal = calculateSecureSubtotal();
+  // Order summary calculations (same as CartDrawer)
+  const subtotal = getSubtotal();
   const freeShippingThreshold = 59;
-  const remaining = Math.max(freeShippingThreshold - secureSubtotal, 0);
-  const progress = Math.min((secureSubtotal / freeShippingThreshold) * 100, 100);
-
-  if (hasError) {
-    return (
-      <>
-        <TopBar />
-        <MainNav />
-        <Box sx={{ p: 4, textAlign: "center" }}>
-          <Typography color="error">
-            Failed to load product details. Please try again.
-          </Typography>
-        </Box>
-      </>
-    );
-  }
+  const remaining = Math.max(freeShippingThreshold - subtotal, 0);
+  const progress = Math.min((subtotal / freeShippingThreshold) * 100, 100);
 
   return (
     <>
@@ -88,7 +51,7 @@ export default function ReviewBagPage() {
       <Grid container spacing={4} sx={{ p: 4 }}>
         {/* LEFT SIDE - Product Cards */}
         <Grid item xs={12} md={8}>
-          <Typography variant="h5" sx={{ mb: 3, color: "#333" }}>
+          <Typography variant="h5" sx={{ mb: 3 , color: "#333"}}>
             Review Your Bag
           </Typography>
 
@@ -117,7 +80,7 @@ export default function ReviewBagPage() {
                     >
                       <CardMedia
                         component="img"
-                        image={product.images?.[0] || cartItem.image || ""}
+                        image={product.images?.[0] || ""}
                         alt={product.title}
                         sx={{ height: 200, objectFit: "cover" }}
                       />
@@ -125,20 +88,14 @@ export default function ReviewBagPage() {
                         <Typography variant="subtitle2">
                           {product.title}
                         </Typography>
-                        {/* Display size and color from cart item */}
                         <Typography variant="body2" color="text.secondary">
-                          Size: {cartItem.size} | Color: {cartItem.color}
+                          {cartItem.size}, {cartItem.color}
                         </Typography>
-                        {/* Use SECURE price from database */}
-                        <Typography variant="body1" sx={{ fontWeight: "bold", color: "#2e7d32" }}>
+                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                           ${product.price.toFixed(2)}
                         </Typography>
                         <Typography variant="body2">
-                          Quantity: {cartItem.quantity}
-                        </Typography>
-                        {/* Show total for this item */}
-                        <Typography variant="body2" sx={{ fontWeight: "bold", mt: 1 }}>
-                          Item Total: ${(product.price * cartItem.quantity).toFixed(2)}
+                          Qty: {cartItem.quantity}
                         </Typography>
                       </CardContent>
                       <CardActions sx={{ justifyContent: "space-between" }}>
@@ -169,76 +126,106 @@ export default function ReviewBagPage() {
           )}
         </Grid>
 
-        {/* RIGHT SIDE - Order Summary */}
+        {/* RIGHT SIDE - Cart Summary (CartDrawer styles) */}
         <Grid item xs={12} md={4}>
-          <Card sx={{ p: 3, position: "sticky", top: 20 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Order Summary
+          <Box
+            sx={{
+              border: "1px solid #ddd",
+              borderRadius: 2,
+              p: 2,
+              display: "flex",
+              flexDirection: "column",
+              height: "fit-content",
+              position: "sticky",
+              top: 20,
+            }}
+          >
+            <Typography variant="h6">
+              My Shopping Bag ({cartItems.length} Item
+              {cartItems.length !== 1 && "s"})
             </Typography>
-            
-            <Box sx={{ mb: 2 }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                <Typography>Subtotal:</Typography>
-                <Typography sx={{ fontWeight: "bold" }}>
-                  ${secureSubtotal.toFixed(2)}
-                </Typography>
-              </Box>
-              
-              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                <Typography>Shipping:</Typography>
-                <Typography>
-                  {secureSubtotal >= freeShippingThreshold ? "FREE" : "TBD"}
-                </Typography>
-              </Box>
-              
-              <Divider sx={{ my: 2 }} />
-              
-              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-                <Typography variant="h6">Total:</Typography>
-                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                  ${secureSubtotal.toFixed(2)}
-                </Typography>
-              </Box>
-            </Box>
 
-            {/* Free Shipping Progress */}
-            {remaining > 0 && (
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Add ${remaining.toFixed(2)} more for free shipping
-                </Typography>
-                <Box sx={{ 
-                  width: "100%", 
-                  height: 8, 
-                  backgroundColor: "#e0e0e0", 
-                  borderRadius: 4,
-                  overflow: "hidden"
-                }}>
-                  <Box sx={{
-                    width: `${progress}%`,
-                    height: "100%",
-                    backgroundColor: "#2e7d32",
-                    transition: "width 0.3s ease"
-                  }} />
+            <Divider sx={{ my: 2 }} />
+
+            {cartItems.length === 0 ? (
+              <Typography variant="body2">Your bag is empty.</Typography>
+            ) : (
+              cartItems.map((item) => (
+                <Box
+                  key={`${item.id}-${item.size}-${item.color}`}
+                  display="flex"
+                  mb={2}
+                  alignItems="center"
+                >
+                  <Box
+                    component="img"
+                    src={item.image}
+                    alt={item.title}
+                    sx={{ width: 80, height: 100, objectFit: "cover", mr: 2 }}
+                  />
+                  <Box flexGrow={1}>
+                    <Typography variant="subtitle2">{item.title}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {item.size}, {item.color}
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                      ${item.price.toFixed(2)}
+                    </Typography>
+                    <Typography variant="body2">
+                      Qty: {item.quantity}
+                    </Typography>
+                  </Box>
+                  <IconButton
+                    aria-label="remove item"
+                    size="small"
+                    color="error"
+                    onClick={() =>
+                      removeFromCart(item.id, item.size, item.color)
+                    }
+                    sx={{ ml: 1 }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
                 </Box>
-              </Box>
+              ))
             )}
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="subtitle1">
+              Subtotal: ${subtotal.toFixed(2)}
+            </Typography>
+            {remaining > 0 && (
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                Only ${remaining.toFixed(2)} away from FREE SHIPPING
+              </Typography>
+            )}
+            <Box
+              sx={{
+                width: "100%",
+                height: 6,
+                backgroundColor: "#eee",
+                borderRadius: 3,
+              }}
+            >
+              <Box
+                sx={{
+                  width: `${progress}%`,
+                  height: "100%",
+                  backgroundColor: "blue",
+                  borderRadius: 3,
+                }}
+              />
+            </Box>
 
             <Button
               variant="contained"
+              sx={{ mt: 2, borderRadius: 10, py: 1.5, fontWeight: "bold" }}
               fullWidth
-              size="large"
-              sx={{
-                backgroundColor: "#1976d2",
-                "&:hover": { backgroundColor: "#1565c0" },
-                py: 1.5,
-                fontSize: "1.1rem",
-                fontWeight: "bold"
-              }}
             >
-              Proceed to Checkout
+              Checkout
             </Button>
-          </Card>
+          </Box>
         </Grid>
       </Grid>
     </>
