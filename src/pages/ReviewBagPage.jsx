@@ -51,7 +51,7 @@ export default function ReviewBagPage() {
       <Grid container spacing={4} sx={{ p: 4 }}>
         {/* LEFT SIDE - Product Cards */}
         <Grid item xs={12} md={8}>
-          <Typography variant="h5" sx={{ mb: 3 , color: "#333"}}>
+          <Typography variant="h5" sx={{ mb: 3 }}>
             Review Your Bag
           </Typography>
 
@@ -140,7 +140,7 @@ export default function ReviewBagPage() {
               top: 20,
             }}
           >
-            <Typography variant="h6">
+            <Typography variant="h6" color="text.primary" fontWeight={"bold"}>
               My Shopping Bag ({cartItems.length} Item
               {cartItems.length !== 1 && "s"})
             </Typography>
@@ -164,15 +164,21 @@ export default function ReviewBagPage() {
                     sx={{ width: 80, height: 100, objectFit: "cover", mr: 2 }}
                   />
                   <Box flexGrow={1}>
-                    <Typography variant="subtitle2">{item.title}</Typography>
+                    <Typography variant="subtitle2" color="text.primary">
+                      {item.title}
+                    </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {item.size}, {item.color}
                     </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      sx={{ fontWeight: "bold" }}
+                    >
                       ${item.price.toFixed(2)}
                     </Typography>
-                    <Typography variant="body2">
-                      Qty: {item.quantity}
+                    <Typography variant="body2" color="text.secondary">
+                      Quantity: {item.quantity}
                     </Typography>
                   </Box>
                   <IconButton
@@ -192,15 +198,15 @@ export default function ReviewBagPage() {
 
             <Divider sx={{ my: 2 }} />
 
-            <Typography variant="subtitle1">
+            <Typography variant="subtitle1" color="text.primary">
               Subtotal: ${subtotal.toFixed(2)}
             </Typography>
-            {remaining > 0 && (
+            {/* {remaining > 0 && (
               <Typography variant="body2" sx={{ mb: 1 }}>
                 Only ${remaining.toFixed(2)} away from FREE SHIPPING
               </Typography>
-            )}
-            <Box
+            )} */}
+            {/* <Box
               sx={{
                 width: "100%",
                 height: 6,
@@ -216,7 +222,7 @@ export default function ReviewBagPage() {
                   borderRadius: 3,
                 }}
               />
-            </Box>
+            </Box> */}
 
             <Button
               variant="contained"
