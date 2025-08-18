@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+
 import {
   Box,
   Typography,
@@ -55,9 +57,13 @@ export default function MainNav() {
 
   return (
     <Box sx={navBarStyles}>
-      <Typography sx={{ fontWeight: "bold", fontSize: "1rem" }}>
-        TheShop
-      </Typography>
+      <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+        <Typography
+          sx={{ fontWeight: "bold", fontSize: "1rem", cursor: "pointer" }}
+        >
+          TheShop
+        </Typography>
+      </Link>
 
       {isMobile ? (
         <>
