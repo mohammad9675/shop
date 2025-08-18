@@ -11,6 +11,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import { useCart } from "../context/CartContext";
 import CartDrawer from "./ShoppingCart/CartDrawer.jsx";
+import { Link } from "react-router-dom";
 
 const topBarStyles = {
   display: "flex",
@@ -70,7 +71,9 @@ export default function TopBar() {
         </Box>
 
         <Box sx={logoStyles}>
-          <img src="/images/logo.png" alt="Logo" height={60} />
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <img src="/images/logo.png" alt="Logo" height={60} />
+          </Link>
         </Box>
 
         <Box sx={iconsStyles}>
