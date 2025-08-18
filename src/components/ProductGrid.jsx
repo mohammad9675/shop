@@ -13,6 +13,7 @@ import "swiper/css/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 // 🎨 Styles
 const sectionStyles = {
@@ -80,6 +81,7 @@ const viewAllButtonStyles = {
 
 export default function ProductGrid({ title }) {
   const { id: productId } = useParams();
+  const navigate = useNavigate();
   const isSimilarItems = title === "Similar Items";
 
   const {
@@ -152,7 +154,11 @@ export default function ProductGrid({ title }) {
         >
           {products?.map((product) => (
             <SwiperSlide key={product._id}>
-              <Card sx={cardStyles}>
+              <Card
+                sx={cardStyles}
+                onClick={() => navigate(`/products/${product._id}`)}
+                style={{ cursor: "pointer" }}
+              >
                 <CardMedia
                   component="img"
                   height="240"
