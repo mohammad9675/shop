@@ -48,9 +48,9 @@ export default function ReviewBagPage() {
     <>
       <TopBar />
       <MainNav />
-      <Grid container spacing={4} sx={{ p: 4 }}>
+      <Box sx={{ p: 4, display: "flex", gap: 4, alignItems: "flex-start" }}>
         {/* LEFT SIDE - Product Cards */}
-        <Grid item xs={12} md={8}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="h5" sx={{ mb: 3 }}>
             Review Your Bag
           </Typography>
@@ -124,116 +124,114 @@ export default function ReviewBagPage() {
           ) : (
             <Typography>Your bag is empty.</Typography>
           )}
-        </Grid>
+        </Box>
 
-        {/* RIGHT SIDE - Cart Summary (CartDrawer styles) */}
-        <Grid item xs={12} md={4}>
-          <Box
+        {/* RIGHT SIDE - Cart Summary (Fixed Width Sidebar) */}
+        <Box
+          sx={{
+            width: 350, // Fixed width
+            flexShrink: 0, // Prevent shrinking
+            border: "1px solid #ddd",
+            borderRadius: 2,
+            p: 2,
+            display: "flex",
+            flexDirection: "column",
+            height: "fit-content",
+            position: "sticky",
+            top: 20,
+          }}
+        >
+          <Typography variant="h6" color="text.primary" fontWeight={"bold"}>
+            My Shopping Bag ({cartItems.length} Item
+            {cartItems.length !== 1 && "s"})
+          </Typography>
+
+          <Divider sx={{ my: 2 }} />
+
+          {cartItems.length === 0 ? (
+            <Typography variant="body2">Your bag is empty.</Typography>
+          ) : (
+            cartItems.map((item) => (
+              <Box
+                key={`${item.id}-${item.size}-${item.color}`}
+                display="flex"
+                mb={2}
+                alignItems="center"
+              >
+                <Box
+                  component="img"
+                  src={item.image}
+                  alt={item.title}
+                  sx={{ width: 80, height: 100, objectFit: "cover", mr: 2 }}
+                />
+                <Box flexGrow={1}>
+                  <Typography variant="subtitle2" color="text.primary">
+                    {item.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {item.size}, {item.color}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{ fontWeight: "bold" }}
+                  >
+                    ${item.price.toFixed(2)}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Quantity: {item.quantity}
+                  </Typography>
+                </Box>
+                <IconButton
+                  aria-label="remove item"
+                  size="small"
+                  color="error"
+                  onClick={() => removeFromCart(item.id, item.size, item.color)}
+                  sx={{ ml: 1 }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            ))
+          )}
+
+          <Divider sx={{ my: 2 }} />
+
+          <Typography variant="subtitle1" color="text.primary">
+            Subtotal: ${subtotal.toFixed(2)}
+          </Typography>
+          {/* {remaining > 0 && (
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              Only ${remaining.toFixed(2)} away from FREE SHIPPING
+            </Typography>
+          )} */}
+          {/* <Box
             sx={{
-              border: "1px solid #ddd",
-              borderRadius: 2,
-              p: 2,
-              display: "flex",
-              flexDirection: "column",
-              height: "fit-content",
-              position: "sticky",
-              top: 20,
+              width: "100%",
+              height: 6,
+              backgroundColor: "#eee",
+              borderRadius: 3,
             }}
           >
-            <Typography variant="h6" color="text.primary" fontWeight={"bold"}>
-              My Shopping Bag ({cartItems.length} Item
-              {cartItems.length !== 1 && "s"})
-            </Typography>
-
-            <Divider sx={{ my: 2 }} />
-
-            {cartItems.length === 0 ? (
-              <Typography variant="body2">Your bag is empty.</Typography>
-            ) : (
-              cartItems.map((item) => (
-                <Box
-                  key={`${item.id}-${item.size}-${item.color}`}
-                  display="flex"
-                  mb={2}
-                  alignItems="center"
-                >
-                  <Box
-                    component="img"
-                    src={item.image}
-                    alt={item.title}
-                    sx={{ width: 80, height: 100, objectFit: "cover", mr: 2 }}
-                  />
-                  <Box flexGrow={1}>
-                    <Typography variant="subtitle2" color="text.primary">
-                      {item.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {item.size}, {item.color}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      color="text.secondary"
-                      sx={{ fontWeight: "bold" }}
-                    >
-                      ${item.price.toFixed(2)}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Quantity: {item.quantity}
-                    </Typography>
-                  </Box>
-                  <IconButton
-                    aria-label="remove item"
-                    size="small"
-                    color="error"
-                    onClick={() =>
-                      removeFromCart(item.id, item.size, item.color)
-                    }
-                    sx={{ ml: 1 }}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-              ))
-            )}
-
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="subtitle1" color="text.primary">
-              Subtotal: ${subtotal.toFixed(2)}
-            </Typography>
-            {/* {remaining > 0 && (
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                Only ${remaining.toFixed(2)} away from FREE SHIPPING
-              </Typography>
-            )} */}
-            {/* <Box
+            <Box
               sx={{
-                width: "100%",
-                height: 6,
-                backgroundColor: "#eee",
+                width: `${progress}%`,
+                height: "100%",
+                backgroundColor: "blue",
                 borderRadius: 3,
               }}
-            >
-              <Box
-                sx={{
-                  width: `${progress}%`,
-                  height: "100%",
-                  backgroundColor: "blue",
-                  borderRadius: 3,
-                }}
-              />
-            </Box> */}
+            />
+          </Box> */}
 
-            <Button
-              variant="contained"
-              sx={{ mt: 2, borderRadius: 10, py: 1.5, fontWeight: "bold" }}
-              fullWidth
-            >
-              Checkout
-            </Button>
-          </Box>
-        </Grid>
-      </Grid>
+          <Button
+            variant="contained"
+            sx={{ mt: 2, borderRadius: 10, py: 1.5, fontWeight: "bold" }}
+            fullWidth
+          >
+            Checkout
+          </Button>
+        </Box>
+      </Box>
     </>
   );
 }
